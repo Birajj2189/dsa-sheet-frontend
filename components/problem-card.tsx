@@ -45,7 +45,7 @@ export function ProblemCard({ problem, isSolved, isBookmarked, notes = '' }: Pro
   const [showNotes, setShowNotes]     = useState(false)
   const [notesDraft, setNotesDraft]   = useState(notes)
   const [notesJustSaved, setNotesSaved] = useState(false)
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const saveTimeoutRef = useRef<any>(null)
 
   const diff      = problem.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard'
   const diffStyle = DIFFICULTY_STYLES[diff] ?? DIFFICULTY_STYLES.medium
