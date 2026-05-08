@@ -9,7 +9,7 @@ import { ProblemCard } from '@/components/problem-card'
 import { TopicPageSkeleton } from '@/components/skeletons'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Search, ChevronDown, AlertCircle, ArrowLeft } from 'lucide-react'
+import { Search, ChevronDown, AlertCircle, ArrowLeft, BookOpen } from 'lucide-react'
 import { getTopicBySlug } from '@/lib/api/topics'
 import { getSubtopicsByTopic } from '@/lib/api/subtopics'
 import { getProblemsByTopic } from '@/lib/api/problems'
@@ -26,31 +26,42 @@ const TOPIC_ICONS: Record<string, string> = {
   trees: '🌳', graphs: '🕸️', 'dynamic-programming': '⚡', backtracking: '🔄',
 }
 
+function getSubtopicArticleLink(subtopic: BackendSubtopic, topicTitle?: string) {
+  if (subtopic.articleLink) return subtopic.articleLink
+
+  const query = encodeURIComponent(`${topicTitle ?? ''} ${subtopic.title} DSA article`)
+  return `https://www.google.com/search?q=${query}`
+}
+
 interface AccordionSectionProps {
   id: string
   header: React.ReactNode
+  action?: React.ReactNode
   children: React.ReactNode
   defaultOpen?: boolean
 }
 
-function AccordionSection({ id, header, children, defaultOpen = true }: AccordionSectionProps) {
+function AccordionSection({ id, header, action, children, defaultOpen = true }: AccordionSectionProps) {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
     <div>
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border border-white/5 bg-zinc-900/40 hover:bg-zinc-900/60 hover:border-white/8 transition-colors duration-150 group"
-        aria-expanded={open}
-      >
-        <div className="text-left flex items-center gap-2">{header}</div>
-        <motion.div
-          animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+      <div className="w-full flex items-center gap-2 rounded-2xl border border-white/5 bg-zinc-900/40 hover:bg-zinc-900/60 hover:border-white/8 transition-colors duration-150 group">
+        <button
+          onClick={() => setOpen(o => !o)}
+          className="min-w-0 flex-1 flex items-center justify-between px-4 py-3 text-left"
+          aria-expanded={open}
         >
-          <ChevronDown className="h-3.5 w-3.5 text-zinc-600" />
-        </motion.div>
-      </button>
+          <div className="min-w-0 flex items-center gap-2">{header}</div>
+          <motion.div
+            animate={{ rotate: open ? 180 : 0 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
+            <ChevronDown className="h-3.5 w-3.5 text-zinc-600" />
+          </motion.div>
+        </button>
+        {action && <div className="pr-3">{action}</div>}
+      </div>
 
       <AnimatePresence initial={false}>
         {open && (
@@ -257,6 +268,19 @@ export default function TopicPage() {
                   <AccordionSection
                     id={st._id}
                     defaultOpen={idx < 3}
+                    action={
+                      <a
+                        href={getSubtopicArticleLink(st, topic?.title)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-zinc-500 hover:bg-indigo-500/10 hover:text-indigo-400 transition-colors"
+                        aria-label={`Open article for ${st.title}`}
+                        title={st.articleLink ? `Read curated article for ${st.title}` : `Search articles for ${st.title}`}
+                      >
+                        <BookOpen className="h-3 w-3" />
+                        <span className="hidden sm:inline">Guide</span>
+                      </a>
+                    }
                     header={
                       <>
                         <span className="text-sm font-medium text-zinc-300">{st.title}</span>

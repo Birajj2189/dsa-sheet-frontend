@@ -51,6 +51,7 @@ export interface BackendSubtopic {
   slug: string
   topicId: string
   description?: string
+  articleLink?: string
   order: number
 }
 

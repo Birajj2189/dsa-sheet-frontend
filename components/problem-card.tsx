@@ -37,6 +37,15 @@ const DIFFICULTY_STYLES = {
   hard:   { badge: 'bg-rose-500/10 text-rose-400 border-rose-500/20',           dot: 'bg-rose-400'    },
 }
 
+function getProblemResourceLinks(problem: BackendProblem) {
+  const query = encodeURIComponent(`${problem.title} ${problem.difficulty} DSA solution`)
+
+  return {
+    youtube: problem.youtubeLink ?? `https://www.youtube.com/results?search_query=${query}`,
+    article: problem.articleLink ?? `https://www.google.com/search?q=${query}+article`,
+  }
+}
+
 export function ProblemCard({ problem, isSolved, isBookmarked, notes = '' }: ProblemCardProps) {
   const queryClient        = useQueryClient()
   const { isAuthenticated } = useAuthStore()
@@ -45,10 +54,11 @@ export function ProblemCard({ problem, isSolved, isBookmarked, notes = '' }: Pro
   const [showNotes, setShowNotes]     = useState(false)
   const [notesDraft, setNotesDraft]   = useState(notes)
   const [notesJustSaved, setNotesSaved] = useState(false)
-  const saveTimeoutRef = useRef<any>(null)
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const diff      = problem.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard'
   const diffStyle = DIFFICULTY_STYLES[diff] ?? DIFFICULTY_STYLES.medium
+  const resourceLinks = getProblemResourceLinks(problem)
 
   // ── Guard: show auth modal when unauthenticated ────────────────────────────
 
@@ -98,13 +108,15 @@ export function ProblemCard({ problem, isSolved, isBookmarked, notes = '' }: Pro
 
   const handleNotesChange = (text: string) => {
     setNotesDraft(text)
-    clearTimeout(saveTimeoutRef.current)
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
     saveTimeoutRef.current = setTimeout(() => saveNotes(text), 1500)
   }
 
   // Keep draft in sync if parent updates (e.g. after optimistic reset)
   useEffect(() => setNotesDraft(notes), [notes])
-  useEffect(() => () => clearTimeout(saveTimeoutRef.current), [])
+  useEffect(() => () => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+  }, [])
 
   const handleNotesToggle = () => {
     if (!isAuthenticated && !showNotes) {
@@ -214,18 +226,29 @@ export function ProblemCard({ problem, isSolved, isBookmarked, notes = '' }: Pro
                     <ExternalLink className="h-3 w-3" /> LC
                   </a>
                 )}
-                {problem.youtubeLink && (
-                  <a href={problem.youtubeLink} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-zinc-600 hover:text-zinc-400 hover:bg-white/5 transition-all">
-                    <Video className="h-3 w-3" />
-                  </a>
-                )}
-                {problem.articleLink && (
-                  <a href={problem.articleLink} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-zinc-600 hover:text-zinc-400 hover:bg-white/5 transition-all">
-                    <BookOpen className="h-3 w-3" />
-                  </a>
-                )}
+                <a
+                  href={resourceLinks.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                  aria-label={`Open YouTube resources for ${problem.title}`}
+                  title={problem.youtubeLink ? 'Curated YouTube solution' : 'Search YouTube for this problem'}
+                >
+                  <Video className="h-3 w-3" />
+                  <span className="hidden sm:inline">YT</span>
+                </a>
+
+                <a
+                  href={resourceLinks.article}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-zinc-600 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all"
+                  aria-label={`Open article resources for ${problem.title}`}
+                  title={problem.articleLink ? 'Curated article' : 'Search articles for this problem'}
+                >
+                  <BookOpen className="h-3 w-3" />
+                  <span className="hidden sm:inline">Article</span>
+                </a>
 
                 {/* Bookmark */}
                 <button
