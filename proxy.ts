@@ -3,26 +3,23 @@ import type { NextRequest } from 'next/server'
 
 // /sheet is public — unauthenticated users can browse topics;
 // user-specific actions are gated client-side via AuthModal
-const PROTECTED_PATHS = ['/dashboard', '/profile']
-const AUTH_PATHS = ['/login', '/signup']
+//
+// Important for production:
+// The backend runs on a different HTTPS domain than Amplify, so HttpOnly auth
+// cookies belong to the API domain and are not visible to this Next.js proxy.
+// Dashboard/profile protection is therefore handled client-side via /auth/me.
+const PROTECTED_PATHS: string[] = []
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const hasAccessToken = !!request.cookies.get('accessToken')?.value
 
   const isProtected = PROTECTED_PATHS.some((p) => pathname.startsWith(p))
-  const isAuthPath = AUTH_PATHS.some((p) => pathname.startsWith(p))
 
-  // Redirect unauthenticated users away from protected routes
-  if (isProtected && !hasAccessToken) {
+  // Kept as a no-op extension point for future same-domain deployments.
+  if (isProtected) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('from', pathname)
     return NextResponse.redirect(loginUrl)
-  }
-
-  // Redirect already-authenticated users away from auth pages
-  if (isAuthPath && hasAccessToken) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return NextResponse.next()
