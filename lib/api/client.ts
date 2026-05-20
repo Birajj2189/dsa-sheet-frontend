@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+const isClient = typeof window !== 'undefined'
+const API_URL = isClient ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')
 
 export const apiClient = axios.create({
   baseURL: API_URL,
