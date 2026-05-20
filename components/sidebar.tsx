@@ -15,6 +15,7 @@ import {
   LogOut,
   Loader2,
   Menu,
+  Code2,
 } from 'lucide-react'
 import { useUIStore, useAuthStore } from '@/store'
 import { getTopics } from '@/lib/api/topics'
@@ -170,12 +171,12 @@ function SidebarContent({ collapsed, onClose }: SidebarContentProps) {
       <div className="flex flex-col h-full">
         {/* Logo */}
         <div className={`flex items-center gap-2.5 px-4 h-14 border-b border-white/5 flex-shrink-0 ${collapsed ? 'justify-center px-0' : ''}`}>
-          <Link href="/" className="flex items-center gap-2 min-w-0">
-            <div className="h-7 w-7 flex-shrink-0 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-indigo-400">DS</span>
+          <Link href="/" className="flex items-center gap-2 min-w-0 group">
+            <div className="h-7 w-7 flex-shrink-0 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center group-hover:bg-indigo-500/30 transition-colors">
+              <Code2 className="h-4 w-4 text-indigo-400" />
             </div>
             {!collapsed && (
-              <span className="font-semibold text-sm text-zinc-200 truncate">DSA Sheet</span>
+              <span className="font-semibold text-sm text-zinc-200 truncate group-hover:text-white transition-colors">DSA Sheet</span>
             )}
           </Link>
         </div>

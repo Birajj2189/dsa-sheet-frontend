@@ -3,13 +3,14 @@
 import { Sidebar } from '@/components/sidebar'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Suspense, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Loading from './loading'
 import { getMe } from '@/lib/api/auth'
 import { queryKeys } from '@/lib/query-keys'
 import { useAuthStore, useUIStore } from '@/store'
-import { Menu } from 'lucide-react'
+import { Menu, Code2 } from 'lucide-react'
 
 export default function AuthenticatedLayout({
   children,
@@ -74,12 +75,12 @@ export default function AuthenticatedLayout({
             >
               <Menu className="h-5 w-5" />
             </button>
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
-                <span className="text-[10px] font-bold text-indigo-400">DS</span>
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="h-7 w-7 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center group-hover:bg-indigo-500/30 transition-colors">
+                <Code2 className="h-4 w-4 text-indigo-400" />
               </div>
-              <span className="font-semibold text-sm text-zinc-200">DSA Sheet</span>
-            </div>
+              <span className="font-semibold text-sm text-zinc-200 group-hover:text-white transition-colors">DSA Sheet</span>
+            </Link>
           </div>
         </header>
 
